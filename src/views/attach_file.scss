@@ -32,15 +32,27 @@
     padding: 2rem 0;
     margin-bottom: 1rem;
 
-    > button {
-      // color: rgb(232, 232, 232);
-      padding: 1rem 1rem;
-    }
-
-    > p {
-      color: rgb(232, 232, 232);
+    .options-container {
+      width: 90%;
       display: flex;
-      align-items: center;
+      justify-content: center;
+
+      > * {
+        margin: 0 1rem;
+      }
+
+      > button {
+        // color: rgb(232, 232, 232);
+        padding: 1rem 1rem;
+      }
+
+      .select {
+        * {
+          color: rgb(232, 232, 232);
+          border-color: rgb(255, 61, 61);
+        }
+        width: 15vw;
+      }
     }
 
     .video-container {
