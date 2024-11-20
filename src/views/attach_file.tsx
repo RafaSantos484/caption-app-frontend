@@ -111,24 +111,16 @@ export default function AttachFile() {
                         );
                         console.log(result);
 
-                        /*
-                        if (!result) return console.log(result);
-                        setSubtitlesInfo({
-                          file: response.data,
-                          src: URL.createObjectURL(response.data),
-                        });
-                        */
                         setSubtitlesInfo(
                           segmentsToVttFileInfo(result.segments)
                         );
                       } catch (e: any) {
                         console.log(e);
-                        try {
-                          const err = JSON.parse(await e.response.data.text());
-                          alert(err.detail);
-                        } catch {
-                          alert("Falha ao tentar aplicar legendas");
-                        }
+                        alert(
+                          e.response?.data?.message ||
+                            "Falha ao tentar aplicar legendas"
+                        );
+
                         setSubtitlesInfo(undefined);
                       }
                     }}
@@ -217,34 +209,6 @@ export default function AttachFile() {
                 </video>
               </div>
             )}
-            {/*!!subtitlesInfo && (
-              <div className="video-container">
-                <Tooltip title="Baixar Vídeo" placement="top-start">
-                  <IconButton
-                    className="icon"
-                    color="secondary"
-                    onClick={() => {
-                      // setVideoInfo(undefined);
-                      const link = document.createElement("a");
-                      link.href = subtitlesInfo.src;
-                      link.download = "video_with_subs.mp4";
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
-                  >
-                    <DownloadForOffline />
-                  </IconButton>
-                </Tooltip>
-
-                <video key={subtitlesInfo.src} controls>
-                  <source
-                    src={subtitlesInfo.src}
-                    type={subtitlesInfo.file.type}
-                  />
-                </video>
-              </div>
-            )*/}
           </div>
         </div>
       </ThemeProvider>
