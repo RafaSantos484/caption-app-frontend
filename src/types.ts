@@ -58,3 +58,28 @@ export const languagesDict = {
   cy: "Galês",
 };
 export type Language = keyof typeof languagesDict;
+
+export type FileInfo = {
+  file: File | Blob;
+  src: string;
+};
+
+export type Segment = {
+  id: string;
+  avg_logprob: number;
+  compression_ratio: number;
+  end: number;
+  no_speech_prob: number;
+  seek: number;
+  start: number;
+  temperature: number;
+  text: string;
+  tokens: number[];
+};
+export type TranscriptionResult = {
+  duration: number;
+  language: string;
+  text: string;
+  segments: Segment[];
+  task: "transcribe" | "translate";
+};

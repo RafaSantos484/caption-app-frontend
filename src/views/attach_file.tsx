@@ -13,8 +13,8 @@ import {
 import { useRef, useState } from "react";
 
 import "./attach_file.scss";
-import axios from "axios";
-import { Language, languagesDict } from "../types";
+import { FileInfo, Language, languagesDict } from "../types";
+import { getTranscription, segmentsToVttFileInfo } from "../utils";
 
 const themes = createTheme({
   palette: {
@@ -27,25 +27,14 @@ const themes = createTheme({
   },
 });
 
-type VideoInfo = {
-  file: File | Blob;
-  src: string;
-};
-
 export default function AttachFile() {
-  const [videoInfo, setVideoInfo] = useState<VideoInfo | undefined>(undefined);
-  const [videoWithSubsInfo, setVideoWithSubsInfo] = useState<
-    VideoInfo | null | undefined
+  const [videoInfo, setVideoInfo] = useState<FileInfo | undefined>(undefined);
+  const [subtitlesInfo, setSubtitlesInfo] = useState<
+    FileInfo | null | undefined
   >(undefined);
   const [language, setLanguage] = useState<Language | "auto">("auto");
 
   const hiddenFileInput = useRef<HTMLInputElement>(null);
-
-  function reset() {
-    setVideoInfo(undefined);
-    setVideoWithSubsInfo(undefined);
-    setLanguage("auto");
-  }
 
   return (
     <div className="global-fullscreen-container attach-file-container">
@@ -89,25 +78,7 @@ export default function AttachFile() {
         <div className="attach-container">
           <div className="options-container">
             {(() => {
-              if (!!videoWithSubsInfo) {
-                return (
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          "O vídeo atual com legenda será descartado. Continuar?"
-                        )
-                      ) {
-                        reset();
-                        hiddenFileInput.current?.click();
-                      }
-                    }}
-                  >
-                    Usar Novamente
-                  </Button>
-                );
-              } else if (!videoInfo) {
+              if (!videoInfo) {
                 return (
                   <Button
                     variant="contained"
@@ -123,30 +94,33 @@ export default function AttachFile() {
                   <Button
                     variant="contained"
                     onClick={async () => {
-                      setVideoWithSubsInfo(null);
+                      if (
+                        !!subtitlesInfo &&
+                        !window.confirm(
+                          "As legendas atuais serão perdidas com esta ação. Continuar?"
+                        )
+                      )
+                        return;
+
+                      setSubtitlesInfo(null);
 
                       try {
-                        const apiRoute =
-                          process.env.REACT_APP_API_ROUTE ||
-                          "http://127.0.0.1:8000";
+                        const result = await getTranscription(
+                          videoInfo.file,
+                          language
+                        );
+                        console.log(result);
 
-                        const formData = new FormData();
-                        formData.append("request_video", videoInfo.file);
-                        if (language !== "auto") {
-                          formData.append("language", language);
-                        }
-
-                        const response = await axios.post(apiRoute, formData, {
-                          responseType: "blob",
-                          headers: {
-                            "Content-Type": "multipart/form-data",
-                          },
-                        });
-
-                        setVideoWithSubsInfo({
+                        /*
+                        if (!result) return console.log(result);
+                        setSubtitlesInfo({
                           file: response.data,
                           src: URL.createObjectURL(response.data),
                         });
+                        */
+                        setSubtitlesInfo(
+                          segmentsToVttFileInfo(result.segments)
+                        );
                       } catch (e: any) {
                         console.log(e);
                         try {
@@ -155,10 +129,10 @@ export default function AttachFile() {
                         } catch {
                           alert("Falha ao tentar aplicar legendas");
                         }
-                        setVideoWithSubsInfo(undefined);
+                        setSubtitlesInfo(undefined);
                       }
                     }}
-                    disabled={videoWithSubsInfo !== undefined}
+                    disabled={subtitlesInfo === null}
                   >
                     Aplicar Legenda
                   </Button>
@@ -175,7 +149,7 @@ export default function AttachFile() {
                 onChange={(e) => {
                   setLanguage(e.target.value as Language);
                 }}
-                inputProps={{ readOnly: videoWithSubsInfo !== undefined }}
+                inputProps={{ readOnly: subtitlesInfo === null }}
               >
                 {[["auto", "Detectar Automaticamente"]]
                   .concat(Object.entries(languagesDict))
@@ -193,26 +167,57 @@ export default function AttachFile() {
           <div className="videos-container">
             {!!videoInfo && (
               <div className="video-container">
-                {videoWithSubsInfo === undefined && (
+                <div className="icons-container">
                   <Tooltip title="Remover Vídeo" placement="top-start">
                     <IconButton
                       className="icon"
                       color="error"
+                      disabled={subtitlesInfo === null}
                       onClick={() => {
-                        setVideoInfo(undefined);
+                        if (
+                          !subtitlesInfo ||
+                          window.confirm(
+                            "As legendas atuais serão perdias com esta ação. Continuar?"
+                          )
+                        ) {
+                          setVideoInfo(undefined);
+                          setSubtitlesInfo(undefined);
+                        }
                       }}
                     >
                       <HighlightOff />
                     </IconButton>
                   </Tooltip>
-                )}
+                  {!!subtitlesInfo && (
+                    <Tooltip title="Baixar Legendas" placement="top-start">
+                      <IconButton
+                        className="icon"
+                        color="secondary"
+                        onClick={() => {
+                          // setVideoInfo(undefined);
+                          const link = document.createElement("a");
+                          link.href = subtitlesInfo.src;
+                          link.download = "subs.vtt";
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                        }}
+                      >
+                        <DownloadForOffline />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </div>
 
                 <video key={videoInfo.src} controls>
                   <source src={videoInfo.src} type={videoInfo.file.type} />
+                  {!!subtitlesInfo && (
+                    <track src={subtitlesInfo.src} kind="subtitles" default />
+                  )}
                 </video>
               </div>
             )}
-            {!!videoWithSubsInfo && (
+            {/*!!subtitlesInfo && (
               <div className="video-container">
                 <Tooltip title="Baixar Vídeo" placement="top-start">
                   <IconButton
@@ -221,7 +226,7 @@ export default function AttachFile() {
                     onClick={() => {
                       // setVideoInfo(undefined);
                       const link = document.createElement("a");
-                      link.href = videoWithSubsInfo.src;
+                      link.href = subtitlesInfo.src;
                       link.download = "video_with_subs.mp4";
                       document.body.appendChild(link);
                       link.click();
@@ -232,14 +237,14 @@ export default function AttachFile() {
                   </IconButton>
                 </Tooltip>
 
-                <video key={videoWithSubsInfo.src} controls>
+                <video key={subtitlesInfo.src} controls>
                   <source
-                    src={videoWithSubsInfo.src}
-                    type={videoWithSubsInfo.file.type}
+                    src={subtitlesInfo.src}
+                    type={subtitlesInfo.file.type}
                   />
                 </video>
               </div>
-            )}
+            )*/}
           </div>
         </div>
       </ThemeProvider>
