@@ -36,9 +36,16 @@ export function segmentsToVttFileInfo(
     const milliseconds = isoString.slice(20, 23); // mmm
     return `${timePart}.${milliseconds}`;
   };
+  /*
   segments.forEach(({ start, end, text }) => {
     vttContent += `${formatTime(start)} --> ${formatTime(end)}\n${text}\n\n`;
   });
+  */
+  for (const { start, end, text } of segments) {
+    if (!!text && !text.toLowerCase().includes("amara.org")) {
+      vttContent += `${formatTime(start)} --> ${formatTime(end)}\n${text}\n\n`;
+    }
+  }
 
   const blob = new Blob([vttContent], { type: "text/vtt" });
   const url = URL.createObjectURL(blob);
