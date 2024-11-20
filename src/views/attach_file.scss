@@ -55,21 +55,32 @@
       }
     }
 
-    .video-container {
-      position: relative;
-      // width: 100%;
+    .videos-container {
       display: flex;
-      justify-content: center;
+      justify-content: space-evenly;
+      flex-wrap: wrap;
       margin: 1rem 0;
 
-      > video {
-        max-width: 90%;
-        max-height: 70vh;
+      > * {
+        margin: 0 1rem;
+        width: 45%;
+        min-width: 400px;
       }
-      .delete-button {
-        position: absolute;
-        top: 0;
-        right: 0;
+
+      .video-container {
+        position: relative;
+
+        > video {
+          // max-width: 90%;
+          // max-height: 70vh;
+          width: 100%;
+        }
+        .icon {
+          position: absolute;
+          top: 0;
+          right: 0;
+          z-index: 100;
+        }
       }
     }
   }

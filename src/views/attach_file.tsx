@@ -1,4 +1,4 @@
-import { HighlightOff } from "@mui/icons-material";
+import { DownloadForOffline, HighlightOff } from "@mui/icons-material";
 import {
   Button,
   createTheme,
@@ -40,6 +40,12 @@ export default function AttachFile() {
   const [language, setLanguage] = useState<Language | "auto">("auto");
 
   const hiddenFileInput = useRef<HTMLInputElement>(null);
+
+  function reset() {
+    setVideoInfo(undefined);
+    setVideoWithSubsInfo(undefined);
+    setLanguage("auto");
+  }
 
   return (
     <div className="global-fullscreen-container attach-file-container">
@@ -93,8 +99,7 @@ export default function AttachFile() {
                           "O vídeo atual com legenda será descartado. Continuar?"
                         )
                       ) {
-                        setVideoInfo(undefined);
-                        setVideoWithSubsInfo(undefined);
+                        reset();
                         hiddenFileInput.current?.click();
                       }
                     }}
@@ -185,37 +190,57 @@ export default function AttachFile() {
             </FormControl>
           </div>
 
-          {!!videoInfo && (
-            <div className="video-container">
-              {videoWithSubsInfo === undefined && (
-                <Tooltip title="Remover Vídeo" placement="top-start">
+          <div className="videos-container">
+            {!!videoInfo && (
+              <div className="video-container">
+                {videoWithSubsInfo === undefined && (
+                  <Tooltip title="Remover Vídeo" placement="top-start">
+                    <IconButton
+                      className="icon"
+                      color="error"
+                      onClick={() => {
+                        setVideoInfo(undefined);
+                      }}
+                    >
+                      <HighlightOff />
+                    </IconButton>
+                  </Tooltip>
+                )}
+
+                <video key={videoInfo.src} controls>
+                  <source src={videoInfo.src} type={videoInfo.file.type} />
+                </video>
+              </div>
+            )}
+            {!!videoWithSubsInfo && (
+              <div className="video-container">
+                <Tooltip title="Baixar Vídeo" placement="top-start">
                   <IconButton
-                    className="delete-button"
-                    color="error"
+                    className="icon"
+                    color="secondary"
                     onClick={() => {
-                      setVideoInfo(undefined);
+                      // setVideoInfo(undefined);
+                      const link = document.createElement("a");
+                      link.href = videoWithSubsInfo.src;
+                      link.download = "video_with_subs.mp4";
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
                     }}
                   >
-                    <HighlightOff />
+                    <DownloadForOffline />
                   </IconButton>
                 </Tooltip>
-              )}
 
-              <video key={videoInfo.src} controls>
-                <source src={videoInfo.src} type={videoInfo.file.type} />
-              </video>
-            </div>
-          )}
-          {!!videoWithSubsInfo && (
-            <div className="video-container">
-              <video key={videoWithSubsInfo.src} controls>
-                <source
-                  src={videoWithSubsInfo.src}
-                  type={videoWithSubsInfo.file.type}
-                />
-              </video>
-            </div>
-          )}
+                <video key={videoWithSubsInfo.src} controls>
+                  <source
+                    src={videoWithSubsInfo.src}
+                    type={videoWithSubsInfo.file.type}
+                  />
+                </video>
+              </div>
+            )}
+          </div>
         </div>
       </ThemeProvider>
     </div>
