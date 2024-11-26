@@ -14,20 +14,25 @@
     flex-direction: column;
     align-items: center;
     margin: 3rem 0;
+    text-align: center;
+    width: 95%;
 
     > h1 {
-      margin: 0;
+      margin: 1rem 0;
       color: rgb(255, 61, 61);
       font-weight: normal;
+      font-size: 1.8rem;
     }
     > h4 {
       margin: 0;
       font-weight: normal;
+      font-size: 1rem;
     }
   }
 
   .attach-container {
     width: 80%;
+    min-width: 350px;
     background-color: rgb(22, 22, 22);
     border-radius: 10px;
     display: flex;
@@ -37,56 +42,49 @@
     margin-bottom: 1rem;
 
     .options-container {
-      width: 90%;
+      width: 65%;
+      min-width: 320px;
       display: flex;
       justify-content: center;
+      flex-wrap: wrap;
 
       > * {
-        margin: 0 1rem;
+        margin: 1rem 1rem;
+        // width: 45%;
+        flex: 1;
+        max-width: 300px;
       }
 
       > button {
-        // color: rgb(232, 232, 232);
-        padding: 1rem 1rem;
+        min-width: 100px;
+        padding: 1rem 0;
       }
 
       .select {
+        min-width: 200px;
         * {
           color: rgb(232, 232, 232);
           border-color: rgb(255, 61, 61);
         }
-        width: 15vw;
       }
     }
 
-    .videos-container {
+    .video-container {
+      position: relative;
       display: flex;
-      justify-content: space-evenly;
-      flex-wrap: wrap;
-      margin: 1rem 0;
+      justify-content: center;
 
-      > * {
-        margin: 0 1rem;
-        width: 45%;
-        min-width: 400px;
+      > video {
+        max-width: 80%;
+        max-height: 50vh;
       }
-
-      .video-container {
-        position: relative;
-
-        > video {
-          // max-width: 90%;
-          // max-height: 70vh;
-          width: 100%;
-        }
-        .icons-container {
-          position: absolute;
-          top: -5%;
-          right: -9%;
-          z-index: 100;
-          display: flex;
-          flex-direction: column;
-        }
+      .icons-container {
+        position: absolute;
+        top: -5%;
+        right: 0%;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
       }
     }
   }

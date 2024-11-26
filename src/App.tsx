@@ -1,6 +1,7 @@
 import { DownloadForOffline, HighlightOff } from "@mui/icons-material";
 import {
   Button,
+  CircularProgress,
   createTheme,
   FormControl,
   IconButton,
@@ -128,7 +129,11 @@ function App() {
                     }}
                     disabled={isLoadingSubtitles}
                   >
-                    Aplicar Legenda
+                    {isLoadingSubtitles ? (
+                      <CircularProgress />
+                    ) : (
+                      "Aplicar Legenda"
+                    )}
                   </Button>
                 );
               }
@@ -158,60 +163,58 @@ function App() {
             </FormControl>
           </div>
 
-          <div className="videos-container">
-            {!!videoInfo && (
-              <div className="video-container">
-                <div className="icons-container">
-                  <Tooltip title="Remover Vídeo" placement="top-start">
+          {!!videoInfo && (
+            <div className="video-container">
+              <div className="icons-container">
+                <Tooltip title="Remover Vídeo" placement="top-start">
+                  <IconButton
+                    className="icon"
+                    color="error"
+                    disabled={isLoadingSubtitles}
+                    onClick={() => {
+                      if (
+                        !subtitlesInfo ||
+                        window.confirm(
+                          "As legendas atuais serão perdias com esta ação. Continuar?"
+                        )
+                      ) {
+                        setVideoInfo(undefined);
+                        setSubtitlesInfo(undefined);
+                      }
+                    }}
+                  >
+                    <HighlightOff />
+                  </IconButton>
+                </Tooltip>
+                {!!subtitlesInfo && (
+                  <Tooltip title="Baixar Legendas" placement="top-start">
                     <IconButton
                       className="icon"
-                      color="error"
-                      disabled={isLoadingSubtitles}
+                      color="secondary"
                       onClick={() => {
-                        if (
-                          !subtitlesInfo ||
-                          window.confirm(
-                            "As legendas atuais serão perdias com esta ação. Continuar?"
-                          )
-                        ) {
-                          setVideoInfo(undefined);
-                          setSubtitlesInfo(undefined);
-                        }
+                        // setVideoInfo(undefined);
+                        const link = document.createElement("a");
+                        link.href = subtitlesInfo.src;
+                        link.download = "subs.vtt";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
                       }}
                     >
-                      <HighlightOff />
+                      <DownloadForOffline />
                     </IconButton>
                   </Tooltip>
-                  {!!subtitlesInfo && (
-                    <Tooltip title="Baixar Legendas" placement="top-start">
-                      <IconButton
-                        className="icon"
-                        color="secondary"
-                        onClick={() => {
-                          // setVideoInfo(undefined);
-                          const link = document.createElement("a");
-                          link.href = subtitlesInfo.src;
-                          link.download = "subs.vtt";
-                          document.body.appendChild(link);
-                          link.click();
-                          document.body.removeChild(link);
-                        }}
-                      >
-                        <DownloadForOffline />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </div>
-
-                <video key={videoInfo.src} controls>
-                  <source src={videoInfo.src} type={videoInfo.file.type} />
-                  {!!subtitlesInfo && (
-                    <track src={subtitlesInfo.src} kind="subtitles" default />
-                  )}
-                </video>
+                )}
               </div>
-            )}
-          </div>
+
+              <video key={videoInfo.src} controls>
+                <source src={videoInfo.src} type={videoInfo.file.type} />
+                {!!subtitlesInfo && (
+                  <track src={subtitlesInfo.src} kind="subtitles" default />
+                )}
+              </video>
+            </div>
+          )}
         </div>
       </ThemeProvider>
     </div>
