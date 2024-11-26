@@ -11,7 +11,7 @@ import {
   ThemeProvider,
   Tooltip,
 } from "@mui/material";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import "./app.scss";
 import { FileInfo, Language, languagesDict } from "./types";
@@ -38,6 +38,16 @@ function App() {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
 
   const isLoadingSubtitles = subtitlesInfo === null;
+
+  useEffect(() => {
+    const onResize = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+    };
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   return (
     <div className="app-container">
