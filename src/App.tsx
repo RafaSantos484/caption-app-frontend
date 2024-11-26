@@ -161,7 +161,11 @@ function App() {
                 inputProps={{ readOnly: isLoadingSubtitles }}
               >
                 {[["auto", "Detectar Automaticamente"]]
-                  .concat(Object.entries(languagesDict))
+                  .concat(
+                    Object.entries(languagesDict).sort((a, b) =>
+                      a[1].localeCompare(b[1])
+                    )
+                  )
                   .map(([key, value]) => {
                     return (
                       <MenuItem key={key} value={key}>
