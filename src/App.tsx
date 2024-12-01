@@ -32,10 +32,15 @@ const sortedLanguages = [["auto", "Detectar Automaticamente"]].concat(
   Object.entries(languagesDict).sort((a, b) => a[1].localeCompare(b[1]))
 );
 
+type SubtitlesInfo = {
+  file: FileInfo;
+  analysis: string;
+};
+
 function App() {
   const [videoInfo, setVideoInfo] = useState<FileInfo | undefined>(undefined);
   const [subtitlesInfo, setSubtitlesInfo] = useState<
-    FileInfo | null | undefined
+    SubtitlesInfo | null | undefined
   >(undefined);
   const [language, setLanguage] = useState<Language | "auto">("auto");
 
@@ -128,9 +133,10 @@ function App() {
                         );
                         console.log(result);
 
-                        setSubtitlesInfo(
-                          segmentsToVttFileInfo(result.segments)
-                        );
+                        setSubtitlesInfo({
+                          file: segmentsToVttFileInfo(result.segments),
+                          analysis: result.analysis,
+                        });
                       } catch (e: any) {
                         console.log(e);
                         alert(
@@ -206,7 +212,7 @@ function App() {
                       onClick={() => {
                         // setVideoInfo(undefined);
                         const link = document.createElement("a");
-                        link.href = subtitlesInfo.src;
+                        link.href = subtitlesInfo.file.src;
                         link.download = "subs.vtt";
                         document.body.appendChild(link);
                         link.click();
@@ -222,9 +228,19 @@ function App() {
               <video key={videoInfo.src} controls>
                 <source src={videoInfo.src} type={videoInfo.file.type} />
                 {!!subtitlesInfo && (
-                  <track src={subtitlesInfo.src} kind="subtitles" default />
+                  <track
+                    src={subtitlesInfo.file.src}
+                    kind="subtitles"
+                    default
+                  />
                 )}
               </video>
+
+              {!!subtitlesInfo && (
+                <div className="analysis-container">
+                  <p>{subtitlesInfo.analysis}</p>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -82,4 +82,5 @@ export type TranscriptionResult = {
   text: string;
   segments: Segment[];
   task: "transcribe" | "translate";
+  analysis: string;
 };
