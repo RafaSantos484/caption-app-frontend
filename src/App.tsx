@@ -1,3 +1,4 @@
+import ReactMarkdown from "react-markdown";
 import { DownloadForOffline, HighlightOff } from "@mui/icons-material";
 import {
   Button,
@@ -238,7 +239,7 @@ function App() {
 
               {!!subtitlesInfo && (
                 <div className="analysis-container">
-                  <p>{subtitlesInfo.analysis}</p>
+                  <ReactMarkdown>{subtitlesInfo.analysis}</ReactMarkdown>
                 </div>
               )}
             </div>
