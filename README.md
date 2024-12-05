@@ -22,4 +22,6 @@ App Web desenvolvido em **React** com **TypeScript**, utilizando API da **OpenAI
 - Confira o vídeo de demonstração abaixo:
 
 
+https://github.com/user-attachments/assets/80356b12-e30d-44c3-a1a8-b3b344fda97b
+
 - [Testar o app](https://caption-app-frontend.vercel.app/)
